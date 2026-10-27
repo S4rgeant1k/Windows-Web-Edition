@@ -23,13 +23,22 @@ npm run typecheck
 **https://s4rgeant1k.github.io/Windows-Web-Edition/**
 
 Деплой автоматический: workflow `.github/workflows/deploy-pages.yml` при push
-в ветку проекта собирает приложение командой
-`npm run build -- --base /Windows-Web-Edition/`, добавляет `404.html` для SPA,
-переводит источник Pages в режим **GitHub Actions** и публикует артефакт через
-`actions/deploy-pages`. Все URL ассетов строятся через `src/lib/assets.ts` на
-основе `import.meta.env.BASE_URL`, поэтому иконки и обои корректно работают и
-локально (`/`), и на подпути Pages. Ручной запуск — кнопка **Run workflow** во
-вкладке Actions репозитория.
+в `main` (или в ветку проекта) собирает приложение командой
+`npm run build -- --base /Windows-Web-Edition/`, добавляет `404.html` для SPA
+и публикует артефакт через `actions/upload-pages-artifact` + `actions/deploy-pages`.
+Все URL ассетов строятся через `src/lib/assets.ts` на основе
+`import.meta.env.BASE_URL`, поэтому иконки и обои корректно работают и локально
+(`/`), и на подпути Pages.
+
+**Особенность этого репозитория:** Pages изначально включён в legacy-режиме
+(источник — ветка `main`, корень), а токен интеграции не имеет прав менять
+`build_type` (API возвращает 403). Поэтому workflow сначала пытается переключить
+источник на **GitHub Actions**, а если не получается — дожидается завершения
+legacy Jekyll-сборки и публикует собранный артефакт **после** неё (иначе Jekyll
+перезапишет сайт исходниками). Рекомендуется один раз переключить источник
+вручную: **Settings → Pages → Build and deployment → Source: GitHub Actions** —
+после этого workflow работает по стандартной схеме без ожидания.
+Ручной запуск — кнопка **Run workflow** во вкладке Actions репозитория.
 
 ## Что реализовано
 

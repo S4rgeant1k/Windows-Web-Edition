@@ -46,21 +46,31 @@ jobs:
           touch dist/.nojekyll
 
       # Pages в этом репозитории исторически настроен на legacy-источник (ветка main).
-      # Токен интеграции не имеет права менять build_type, поэтому пробуем переключить
-      # его (если всё-таки получится — дальше всё работает как обычно), а затем ждём
-      # завершения legacy-сборки, чтобы наш артефакт записался в сайт ПОСЛЕ неё.
-      - name: Try to switch Pages source to GitHub Actions
+      # Токен интеграции не может сменить build_type (403), поэтому:
+      #  1) пытаемся переключить источник на GitHub Actions (сработает у обычного PAT/админа);
+      #  2) если не вышло — ждём завершения legacy Jekyll-сборки и публикуем артефакт
+      #     ПОСЛЕ неё, иначе Jekyll перезапишет сайт исходниками.
+      - name: Check Pages source
+        id: pages_source
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           current=$(gh api "repos/${{ github.repository }}/pages" --jq '.build_type' || echo unknown)
           echo "Current Pages build_type: $current"
-          if [ "$current" != "workflow" ]; then
-            gh api -X PUT "repos/${{ github.repository }}/pages" -f build_type=workflow \
-              || echo "::notice title=Pages source::Токен не смог сменить источник; применяется порядок деплоя после legacy-сборки."
+          if [ "$current" = "workflow" ]; then
+            echo "legacy=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if gh api -X PUT "repos/${{ github.repository }}/pages" -f build_type=workflow; then
+            echo "Pages source switched to GitHub Actions."
+            echo "legacy=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "::notice title=Pages source::Токен не смог сменить источник; деплой будет выполнен после legacy-сборки."
+            echo "legacy=true" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Wait for legacy Pages build to settle
+        if: steps.pages_source.outputs.legacy == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
