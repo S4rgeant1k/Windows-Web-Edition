@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - arena/0016254c-windows-web-edition
   workflow_dispatch:
 
 # Права нужны для создания Pages-деплоя из артефакта.
@@ -75,14 +74,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           target="${{ github.sha }}"
-          for i in $(seq 1 36); do
+          for i in $(seq 1 60); do
             info=$(gh api "repos/${{ github.repository }}/pages/builds/latest" --jq '[.status, .commit] | @tsv' 2>/dev/null || true)
             status=$(printf '%s' "$info" | cut -f1)
             commit=$(printf '%s' "$info" | cut -f2)
             echo "attempt $i: status=$status commit=$commit"
             if [ "$commit" = "$target" ] && [ "$status" = "built" ]; then
               echo "Legacy build finished. Waiting a few more seconds before publishing the artifact."
-              sleep 12
+              sleep 20
               break
             fi
             sleep 5
