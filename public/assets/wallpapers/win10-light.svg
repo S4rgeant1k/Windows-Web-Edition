@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" width="1920" height="1080">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8FD4F5"/><stop offset="48%" stop-color="#2A9BE0"/><stop offset="1" stop-color="#0057A8"/></linearGradient>
+    <radialGradient id="sun" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".95"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient>
+    <linearGradient id="b2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF" stop-opacity=".4"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></linearGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#sky)"/>
+  <circle cx="960" cy="500" r="420" fill="url(#sun)" opacity=".8"/>
+  <g fill="url(#b2)"><path d="M960 500L0 0h420z"/><path d="M960 500L1920 0v330z"/><path d="M960 500L0 1080h360z"/><path d="M960 500L1920 1080h-430z"/></g>
+  <g stroke="#FFFFFF" stroke-opacity=".22" fill="none" stroke-width="3"><path d="M960 500L520 180M960 500l440-320M960 500L480 900M960 500l480 400"/></g>
+  <ellipse cx="960" cy="500" rx="260" ry="200" fill="#FFFFFF" opacity=".12"/>
+</svg>
