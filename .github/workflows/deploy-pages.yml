@@ -7,7 +7,7 @@ on:
       - arena/0016254c-windows-web-edition
   workflow_dispatch:
 
-# Права нужны для переключения источника Pages и деплоя артефакта.
+# Права нужны для создания Pages-деплоя из артефакта.
 permissions:
   contents: read
   pages: write
@@ -45,23 +45,41 @@ jobs:
           cp dist/index.html dist/404.html
           touch dist/.nojekyll
 
-      # Pages изначально был настроен на legacy-источник (ветка main).
-      # Переводим его на сборку из GitHub Actions; повторные запуски ничего не меняют.
-      - name: Ensure Pages source is GitHub Actions
-        continue-on-error: true
+      # Pages в этом репозитории исторически настроен на legacy-источник (ветка main).
+      # Токен интеграции не имеет права менять build_type, поэтому пробуем переключить
+      # его (если всё-таки получится — дальше всё работает как обычно), а затем ждём
+      # завершения legacy-сборки, чтобы наш артефакт записался в сайт ПОСЛЕ неё.
+      - name: Try to switch Pages source to GitHub Actions
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           current=$(gh api "repos/${{ github.repository }}/pages" --jq '.build_type' || echo unknown)
           echo "Current Pages build_type: $current"
           if [ "$current" != "workflow" ]; then
-            gh api -X PUT "repos/${{ github.repository }}/pages" -f build_type=workflow
+            gh api -X PUT "repos/${{ github.repository }}/pages" -f build_type=workflow \
+              || echo "::notice title=Pages source::Токен не смог сменить источник; применяется порядок деплоя после legacy-сборки."
           fi
+
+      - name: Wait for legacy Pages build to settle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          target="${{ github.sha }}"
+          for i in $(seq 1 36); do
+            info=$(gh api "repos/${{ github.repository }}/pages/builds/latest" --jq '[.status, .commit] | @tsv' 2>/dev/null || true)
+            status=$(printf '%s' "$info" | cut -f1)
+            commit=$(printf '%s' "$info" | cut -f2)
+            echo "attempt $i: status=$status commit=$commit"
+            if [ "$commit" = "$target" ] && [ "$status" = "built" ]; then
+              echo "Legacy build finished. Waiting a few more seconds before publishing the artifact."
+              sleep 12
+              break
+            fi
+            sleep 5
+          done
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
