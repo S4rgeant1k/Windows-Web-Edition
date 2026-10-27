@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice" width="1920" height="1080">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="48%" r="75%"><stop offset="0" stop-color="#123E7A"/><stop offset="55%" stop-color="#071B3C"/><stop offset="1" stop-color="#030A18"/></radialGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#62D6FF" stop-opacity=".55"/><stop offset="1" stop-color="#62D6FF" stop-opacity="0"/></linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#CFF4FF" stop-opacity=".85"/><stop offset="1" stop-color="#CFF4FF" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#bg)"/>
+  <g opacity=".35" fill="url(#beam)"><path d="M960 470L0 0h230z"/><path d="M960 470L540 0h140z"/><path d="M960 470L1920 60v170z"/><path d="M960 470L0 1080h280z"/><path d="M960 470L1920 1080h-300z"/></g>
+  <ellipse cx="960" cy="500" rx="560" ry="360" fill="url(#glow)" opacity=".28"/>
+  <g stroke="#8AE0FF" stroke-opacity=".12" fill="none" stroke-width="2"><path d="M960 470L540 210M960 470l420-260M960 470L500 820M960 470l460 350"/></g>
+</svg>

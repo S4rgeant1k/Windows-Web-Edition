@@ -1,0 +1,182 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --------------------------------------------------------------------------
+   Win10 Fluent-подобная палитра. Значения подменяются в App.tsx при смене
+   темы и акцентного цвета, поэтому все компоненты реагируют мгновенно.
+   -------------------------------------------------------------------------- */
+:root,
+:root[data-theme='light'] {
+  --accent: #0078d7;
+  --app-bg: #ffffff;
+  --menu-bg: rgba(246, 247, 248, 0.97);
+  --menu-border: rgba(0, 0, 0, 0.14);
+  --dialog-bg: #ffffff;
+  --text-primary: #1b1b1b;
+  --text-muted: #5c5c5c;
+  --divider: rgba(0, 0, 0, 0.1);
+  --input-border: #c8c8c8;
+  --input-bg: #ffffff;
+  --button-bg: #f7f7f7;
+  --hover-bg: rgba(0, 0, 0, 0.06);
+  --selected-bg: rgba(0, 120, 215, 0.12);
+  --toolbar-bg: #f4f5f7;
+  --sidebar-bg: #eef2f6;
+  --header-active: #ffffff;
+  --header-inactive: #f2f2f2;
+  --header-border: rgba(0, 0, 0, 0.09);
+  --header-border-active: var(--accent);
+  --header-button-hover: rgba(0, 0, 0, 0.08);
+  --window-border: rgba(0, 0, 0, 0.24);
+  --start-rail: rgba(0, 0, 0, 0.035);
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --app-bg: #1f1f1f;
+  --menu-bg: rgba(34, 34, 34, 0.96);
+  --menu-border: rgba(255, 255, 255, 0.13);
+  --dialog-bg: #2b2b2b;
+  --text-primary: #f3f3f3;
+  --text-muted: #b4b4b4;
+  --divider: rgba(255, 255, 255, 0.12);
+  --input-border: #555555;
+  --input-bg: #262626;
+  --button-bg: #333333;
+  --hover-bg: rgba(255, 255, 255, 0.1);
+  --selected-bg: rgba(0, 120, 215, 0.26);
+  --toolbar-bg: #282828;
+  --sidebar-bg: #202020;
+  --header-active: #2c2c2c;
+  --header-inactive: #242424;
+  --header-border: rgba(255, 255, 255, 0.09);
+  --header-border-active: var(--accent);
+  --header-button-hover: rgba(255, 255, 255, 0.12);
+  --window-border: rgba(0, 0, 0, 0.65);
+  --start-rail: rgba(255, 255, 255, 0.04);
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Segoe UI Variable', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont,
+    Roboto, 'Helvetica Neue', sans-serif;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--text-primary);
+  background: #0078d7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+}
+
+input,
+textarea {
+  user-select: text;
+}
+
+button {
+  font: inherit;
+  cursor: default;
+}
+
+::selection {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+/* Во время перетаскивания курсор и выделение фиксируются на уровне body,
+   чтобы случайный текст в iframe/документе не подсвечивался. */
+body.is-dragging,
+body.is-dragging * {
+  cursor: move !important;
+  user-select: none !important;
+}
+
+body.is-resizing,
+body.is-resizing * {
+  user-select: none !important;
+}
+
+@layer components {
+  .icon-button {
+    @apply flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-[2px] hover:bg-[var(--hover-bg)] disabled:cursor-default disabled:opacity-30 disabled:hover:bg-transparent;
+  }
+
+  .command-button {
+    @apply flex h-[28px] shrink-0 items-center gap-1.5 rounded-[2px] border border-transparent px-2 text-win-sm hover:border-[var(--input-border)] hover:bg-[var(--hover-bg)] disabled:cursor-default disabled:opacity-35 disabled:hover:border-transparent disabled:hover:bg-transparent;
+  }
+}
+
+/* Тонкие полосы прокрутки в стиле Windows 10. */
+.fluent-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 120, 120, 0.45) transparent;
+}
+
+.fluent-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.fluent-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.fluent-scroll::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 6px;
+  background-clip: padding-box;
+  background-color: rgba(120, 120, 120, 0.45);
+}
+
+.fluent-scroll::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(100, 100, 100, 0.7);
+}
+
+.fluent-scroll::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Анимации появления оболочечных элементов. */
+@keyframes boot-fade {
+  from {
+    opacity: 0;
+    transform: scale(1.015);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.boot-fade {
+  animation: boot-fade 320ms ease-out both;
+}
+
+@keyframes live-tile-flip {
+  0%,
+  40% {
+    transform: translateY(0);
+  }
+  50%,
+  90% {
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.live-tile-flip {
+  animation: live-tile-flip 7s ease-in-out infinite;
+}
