@@ -39,6 +39,25 @@ jobs:
       - name: Type check + production build
         run: npm run build -- --base "/${{ github.event.repository.name }}/"
 
+      # Регрессионная проверка: все иконки/обои лежат в public/assets, поэтому
+      # в собранном JS сразу после base должен идти префикс assets/. Без него
+      # картинки отдавали бы 404 (base/icons/... вместо base/assets/icons/...).
+      - name: Verify asset URLs
+        env:
+          BASE_PATH: /${{ github.event.repository.name }}/
+        run: |
+          test -f dist/assets/icons/start-menu.svg
+          test -f dist/assets/wallpapers/win10-default.jpg
+          if grep -RqF "${BASE_PATH}icons/" dist/assets/*.js; then
+            echo "::error::Asset URLs are missing the assets/ prefix"
+            exit 1
+          fi
+          if ! grep -RqF "${BASE_PATH}assets/" dist/assets/*.js; then
+            echo "::error::Built bundle does not contain base + assets/ URLs"
+            exit 1
+          fi
+          echo "Asset URLs are correct: ${BASE_PATH}assets/..."
+
       - name: Add SPA fallback and disable Jekyll
         run: |
           cp dist/index.html dist/404.html
